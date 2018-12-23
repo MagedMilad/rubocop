@@ -1442,10 +1442,10 @@ RSpec.describe RuboCop::CLI, :isolated_environment do
       YAML
 
       expect(cli.run(%w[--format simple example])).to eq(1)
-      expect($stderr.string)
-        .to eq(['Warning: unrecognized parameter Metrics/LineLength:Min ' \
-                'found in example/.rubocop.yml',
-                ''].join("\n"))
+
+      expect($stderr.string).to eq(<<-RESULT.strip_indent)
+            Warning: Metrics/LineLength does not support Min parameter. Supported parameters are: ["Description", "StyleGuide", "Enabled", "VersionAdded", "VersionChanged", "Max", "AllowHeredoc", "AllowURI", "URISchemes", "IgnoreCopDirectives", "IgnoredPatterns"]
+      RESULT
     end
 
     it 'prints an error message for an unrecognized EnforcedStyle' do

@@ -509,12 +509,14 @@ module RuboCop
     def validate_parameter_names(valid_cop_names)
       valid_cop_names.each do |name|
         validate_section_presence(name)
+        default_configuration = ConfigLoader.default_configuration[name]
         self[name].each_key do |param|
           next if COMMON_PARAMS.include?(param) ||
-                  ConfigLoader.default_configuration[name].key?(param)
+                  default_configuration.key?(param)
 
-          warn Rainbow("Warning: unrecognized parameter #{name}:#{param} " \
-                       "found in #{smart_loaded_path}").yellow
+          warn Rainbow("Warning: #{name} does not support #{param} parameter." \
+                       ' Supported parameters are: ' \
+                       "#{default_configuration.keys}").yellow
         end
       end
     end
