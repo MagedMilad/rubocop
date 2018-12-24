@@ -16,6 +16,9 @@ module RuboCop
 
     COMMON_PARAMS = %w[Exclude Include Severity inherit_mode
                        AutoCorrect StyleGuide Details].freeze
+    INTERNAL_PARAMS = %w[Description StyleGuide VersionAdded
+                         VersionChanged Reference"Safe SafeAutoCorrect].freeze
+
     # 2.2 is the oldest officially supported Ruby version.
     DEFAULT_RUBY_VERSION = 2.2
     KNOWN_RUBIES = [2.2, 2.3, 2.4, 2.5, 2.6].freeze
@@ -509,14 +512,18 @@ module RuboCop
     def validate_parameter_names(valid_cop_names)
       valid_cop_names.each do |name|
         validate_section_presence(name)
-        default_configuration = ConfigLoader.default_configuration[name]
-        self[name].each_key do |param|
-          next if COMMON_PARAMS.include?(param) ||
-                  default_configuration.key?(param)
+        default_config = ConfigLoader.default_configuration[name]
 
-          warn Rainbow("Warning: #{name} does not support #{param} parameter." \
-                       ' Supported parameters are: ' \
-                       "#{default_configuration.keys}").yellow
+        self[name].each_key do |param|
+          next if COMMON_PARAMS.include?(param) || default_config.key?(param)
+
+          warn Rainbow(<<-WARNING.strip_margin('|')).yellow
+              |Warning: #{name} does not support #{param} parameter.
+              |
+              |Supported parameters are:
+              |
+              |  - #{(default_config.keys - INTERNAL_PARAMS).join("\n  - ")}
+          WARNING
         end
       end
     end
